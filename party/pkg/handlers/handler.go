@@ -15,7 +15,7 @@ type HelloWorld struct {
 
 func CreateParty() (*events.APIGatewayProxyResponse, error) {
 	return apiResponse(http.StatusOK, HelloWorld{
-		aws.String("Hello World!"),		
+		aws.String("Hello World"),		
 	})
 }
 
