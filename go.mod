@@ -1,4 +1,4 @@
-module github.com/clementbowe14/auxparty/tree/main/party
+module github.com/clementbowe14/auxparty/tree/main
 
 go 1.18
 

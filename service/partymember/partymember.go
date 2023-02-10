@@ -1,7 +1,7 @@
 package model
 
 import (
-	"github.com/clementbowe14/auxparty/main/party/db"
+	"github.com/clementbowe14/auxparty/tree/main/db"
 )
 
 type PartyMember struct {

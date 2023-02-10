@@ -7,9 +7,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/clementbowe14/auxparty/tree/main/party/party"
+	
 	"github.com/clementbowe14/auxparty/tree/main/party/handler"
-	"github.com/clementbowe14/auxparty/tree/main/party/db"
+	"github.com/clementbowe14/auxparty/tree/main/db"
 
 )
 
@@ -38,7 +38,7 @@ func main() {
 	dynamoClient := dynamodb.New(awsSession)
 
 	e := handler.EventHandler{
-		partyService: &party.PartyServiceProvider{
+		partyService: &service.party.PartyServiceProvider{
 			DatabaseClient: db.DynamoClient[Party]{
 				tableName: partyTableName,
 				client:    dynamoClient,
