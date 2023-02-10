@@ -1,6 +1,8 @@
 package model
 
-
+import (
+	"github.com/clementbowe14/auxparty/main/party/db"
+)
 
 type PartyMember struct {
 	UserId string `json:"user_id"`
@@ -9,5 +11,9 @@ type PartyMember struct {
 	TotalSongsPlayed int `json:"total_songs_played"`
 	TotalMusicListeningTime int `json:"total_music_listening_time"`
 	Roles []string `json:"roles"`
+}
+
+type PartyMemberServiceProvider struct {
+	DatabaseClient db.DynamoClient[PartyMember]
 }
 

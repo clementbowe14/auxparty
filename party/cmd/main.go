@@ -1,51 +1,49 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/aws/aws-lambda-go/events"
+	"os"
+
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/clementbowe14/auxparty/main/party/db"
+	"github.com/clementbowe14/auxparty/main/party/handler"
+	"github.com/clementbowe14/auxparty/main/party/party"
 )
 
-type HelloWorld struct {
-	Message string `json:"messsage"`
+var (
+	partyTableName       = "party"
+	partyMemberTableName = "partyMember"
+)
+
+//add logging to this
+type EventHandler struct {
+	partyService *party.PartyServiceProvider
 }
-/**
-
-- request body:
-	party_name string
-	party_creator string
-	description string
-
-- createParty
-	- Party{
-		PartyName: party_name
-		PartyCreator: party_creator
-		description: descript
-	}
-**/
 
 func main() {
-	lambda.Start(handler)
-}
 
-func handler(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	return apiResponse()
-}
+	region := os.Getenv("AWS_REGION")
 
-func apiResponse() (*events.APIGatewayProxyResponse, error) {
-	resp := events.APIGatewayProxyResponse{
-		Headers: map[string]string{
-			"Content-Type": "application/json",
+	awsSession, err := session.NewSession(&aws.Config{
+		Region: aws.String(region),
+	})
+
+	if err != nil {
+		return
+	}
+
+	dynamoClient := dynamodb.New(awsSession)
+
+	e := handler.EventHandler{
+		partyService: &party.PartyServiceProvider{
+			DatabaseClient: db.DynamoClient[Party]{
+				tableName: partyTableName,
+				client:    dynamoClient,
+			},
 		},
 	}
 
-	msg := HelloWorld {
-		Message: "Hello Clement! Welcome to APIGateway.",
-	}
-
-	resp.StatusCode = 200
-	stringBody, _ := json.Marshal(msg)
-	resp.Body = string(stringBody)
-
-	return &resp, nil
+	lambda.Start(e.handle)
 }

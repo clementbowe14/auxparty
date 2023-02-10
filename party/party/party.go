@@ -5,20 +5,19 @@ import (
 	"google/uuid"
 	"time"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"github.com/clementbowe14/auxparty/main/party/db"
 )
 
 var (
 	EmptyPartyNameError = "Cannot create a party using an empty string"
-	FailedToMarshalItem = "Failed to marshal item"
-	ErrorCouldNotPutItem = "Error, failed to enter new item"
-	tableName = "party"
 )
 
+type PartyServiceProvider struct {
+	DatabaseClient db.DynamoClient[Party]
+}
+
 type DefaultParty interface {
-	func (partyCreator string, description string, partyName string) (*Party, error)
+	func(partyCreator string, description string, partyName string) (*Party, error)
 }
 
 type Party struct {
@@ -32,14 +31,14 @@ type Party struct {
 	TotalMusicListeningTime int64  `json:"total_music_listening_time`
 }
 
-func CreateParty(partyCreator string, description string, partyName string) (*Party, error) {
+func (p *PartyServiceProvider) CreateParty(partyCreator string, description string, partyName string) (*Party, error) {
 	now := time.Now()
 
 	if len(partyName) == 0 {
 		return nil, errors.New(EmptyPartyNameError)
 	}
 
-	p := Party{
+	party := Party{
 		PartyId:      uuid.NewString(),
 		PartyName:    partyName,
 		PartyCreator: partyCreator,
@@ -48,38 +47,11 @@ func CreateParty(partyCreator string, description string, partyName string) (*Pa
 		Description:  description,
 	}
 
-	attributeValues, err := dynamodbattribute.MarshalMap(p)
+	err := p.DatabaseClient.InsertInto(party)
 
 	if err != nil {
-		return nil, errors.New(FailedToMarshalItem)
+		return nil, err
 	}
 
-	input := &dynamodb.PutItemInput{
-		Item:      attributeValues,
-		TableName: aws.String(tableName),
-	}
-
-	_, err = dynamoClient.putItem(input)
-
-	if err != nil {
-		return nil, errors.New(ErrorCouldNotPutItem)
-	}
-
-	return &p, nil
-
+	return &party, nil
 }
-
-/**
-db
-item Party
-insertInto(item interface{}, tableName) (error) {
-	reflectItem -> Party
-	reflectItem -> attributeValues 
-	attributeValues -> input
-	input -> putItemInput
-
-}
-
-
-**
-/
