@@ -4,8 +4,7 @@ import (
 	"errors"
 	"google/uuid"
 	"time"
-
-	"github.com/clementbowe14/auxparty/main/party/db"
+	"github.com/clementbowe14/auxparty/tree/main/party/db"
 )
 
 var (
