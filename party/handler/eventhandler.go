@@ -1,6 +1,7 @@
 package handler
-(
-	"github.com/clementbowe14/auxparty/main/party/party"
+
+import (
+	"github.com/clementbowe14/auxparty/tree/main/party/party"
 )
 
 
