@@ -28,6 +28,13 @@ type DynamoClient[T interface{}] struct {
 	errChan chan error
 }
 
+func NewDynamoClient[T interface{}](dynamodbSession dynamodbiface.DynamoDBAPI, tableName string) DynamoClient[T] {
+	var d DynamoClient[T]
+	d.tableName = tableName
+	d.client = dynamodbSession
+
+	return d
+}
 /**
 * How do I customize the construction this type parameter list
 to use the generic values that I create?
@@ -50,7 +57,7 @@ func (d *DynamoClient[T])InsertInto(item T) error {
 		d.errChan <- d.client.putItem(input)
 	}()
 
-	err <- d.errChan
+	err = <- d.errChan
 
 	if err != nil {
 		return errors.New(ErrorCouldNotPutItem)

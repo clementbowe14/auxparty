@@ -1,22 +1,38 @@
 package handler
 
 import (
-	"github.com/clementbowe14/auxparty/tree/main/party/party"
-)
+	"encoding/json"
+	"net/http"
 
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/clementbowe14/auxparty/db"
+	"github.com/clementbowe14/auxparty/service/party"
+)
 
 type ErrorBody struct {
 	Message *string `"json:error,omitempty"`
 }
 
 type EventHandler struct {
-	partyService *party.PartyServiceProvider
+	partyService service.PartyServiceProvider
 }
 
+func NewEventHandler(db db.DynamoClient) EventHandler {
+	var h EventHandler
+	h.partyService = party.PartyServiceProvider{
+		DatabaseClient: db,
+	}
+
+	return h
+}
 
 func (e *EventHandler) handle(req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 
-	
+	partyName := req.QueryStringParameters["party_name"]
+	description := req.QueryStringParameters["description"]
+	partyCreator := req.QueryStringParameters["party_creator"]
+
 	party, err := e.partyService.CreateParty(partyCreator, description, partyName)
 
 	if err != nil {

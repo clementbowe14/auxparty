@@ -7,21 +7,15 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	
-	"github.com/clementbowe14/auxparty/tree/main/party/handler"
-	"github.com/clementbowe14/auxparty/tree/main/db"
-
+	"github.com/clementbowe14/auxparty/db"
+	"github.com/clementbowe14/auxparty/party/handler"
+	"github.com/clementbowe14/auxparty/service/party"
 )
 
 var (
 	partyTableName       = "party"
 	partyMemberTableName = "partyMember"
 )
-
-//add logging to this
-type EventHandler struct {
-	partyService *party.PartyServiceProvider
-}
 
 func main() {
 
@@ -35,16 +29,9 @@ func main() {
 		return
 	}
 
-	dynamoClient := dynamodb.New(awsSession)
+	dynamoClient := db.NewDynamoClient[party.Party](dynamodb.New(awsSession), partyTableName)
 
-	e := handler.EventHandler{
-		partyService: &service.party.PartyServiceProvider{
-			DatabaseClient: db.DynamoClient[Party]{
-				tableName: partyTableName,
-				client:    dynamoClient,
-			},
-		},
-	}
+	e := handler.NewEventHandler(dynamoClient)
 
 	lambda.Start(e.handle)
 }

@@ -1,10 +1,11 @@
-package model
+package party
 
 import (
 	"errors"
 	"google/uuid"
 	"time"
-	"github.com/clementbowe14/auxparty/tree/main/db"
+
+	"github.com/clementbowe14/auxparty/db"
 )
 
 var (
