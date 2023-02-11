@@ -15,7 +15,7 @@ type ErrorBody struct {
 }
 
 type EventHandler struct {
-	partyService service.PartyServiceProvider
+	partyService party.PartyServiceProvider
 }
 
 func NewEventHandler(db db.DynamoClient) EventHandler {
